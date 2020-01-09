@@ -75,9 +75,23 @@ class DetailItemViewController: UIViewController {
     
     //MARK: IBActions
     
+    
+    
     @objc func addCart() {
         
-        print("addBasket")
+        downloadCartFromFirestore("1234") { (cart) in
+            
+            if cart == nil {
+                self.createNewCart()
+            } else {
+                cart!.itemIds.append(self.item.id)
+                self.updateCart(cart: cart!, withValues: [kITEMSIDS : cart!.itemIds])
+            }
+        }
+        
+//        createNewCart()
+        
+        // else update
         
     }
     
@@ -85,6 +99,51 @@ class DetailItemViewController: UIViewController {
         self.navigationController?.popViewController(animated: true)
     }
     
+    // Add cart
+    
+    private func createNewCart() {
+        
+        let newCart = Cart()
+        
+        newCart.id = UUID().uuidString
+        newCart.ownerId = "1234"
+        newCart.itemIds = [self.item.id]
+        saveCartToFirestore(newCart)
+        
+        // HUD
+        
+        self.hud.textLabel.text = "Add To Cart"
+        self.hud.indicatorView = JGProgressHUDSuccessIndicatorView()
+        self.hud.show(in: self.view)
+        
+        self.hud.dismiss(afterDelay: 3.0)
+        
+        
+    }
+    
+    private func updateCart(cart : Cart, withValues : [String : Any]) {
+        0
+        updateCartInFirestore(cart, withValues: withValues) { (error) in
+            
+            if error != nil {
+                self.hud.textLabel.text = "Error\(error?.localizedDescription)"
+                self.hud.indicatorView = JGProgressHUDErrorIndicatorView()
+                self.hud.show(in: self.view)
+                
+                self.hud.dismiss(afterDelay: 3.0)
+            } else {
+                // no error
+                
+                self.hud.textLabel.text = "Add To Cart"
+                self.hud.indicatorView = JGProgressHUDSuccessIndicatorView()
+                self.hud.show(in: self.view)
+                
+                self.hud.dismiss(afterDelay: 3.0)
+                
+            }
+        }
+        
+    }
 
 
 }

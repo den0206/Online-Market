@@ -50,7 +50,7 @@ func downloadCartFromFirestore(_ ownerId : String, completion : @escaping (_ car
 
 //MARK:SaveTo Firebase
 
-func saveCardToFirestore(_ cart : Cart) {
+func saveCartToFirestore(_ cart : Cart) {
     FirebaseReference(.Cart).document(cart.id).setData(cartDictionaryFrom(cart) as! [String : Any])
 }
 
@@ -66,3 +66,4 @@ func updateCartInFirestore(_ cart : Cart, withValues : [String : Any], completio
         completion(error)
     }
 }
+
