@@ -79,24 +79,35 @@ class DetailItemViewController: UIViewController {
     
     @objc func addCart() {
         
-        downloadCartFromFirestore("1234") { (cart) in
-            
-            if cart == nil {
-                self.createNewCart()
-            } else {
-                cart!.itemIds.append(self.item.id)
-                self.updateCart(cart: cart!, withValues: [kITEMSIDS : cart!.itemIds])
-            }
-        }
+//        downloadCartFromFirestore("1234") { (cart) in
+//
+//            if cart == nil {
+//                self.createNewCart()
+//            } else {
+//                cart!.itemIds.append(self.item.id)
+//                self.updateCart(cart: cart!, withValues: [kITEMSIDS : cart!.itemIds])
+//            }
+//        }
+//
+////        createNewCart()
+//
+//        // else update
         
-//        createNewCart()
-        
-        // else update
+        showLoginView()
         
     }
     
     @objc func backAction() {
         self.navigationController?.popViewController(animated: true)
+    }
+    
+    private func showLoginView() {
+        
+        let loginVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(identifier: "loginVC")
+              
+              
+        self.present(loginVC, animated: true, completion: nil)
+          
     }
     
     // Add cart

@@ -10,6 +10,7 @@
 		3A247D8123C32FF100E93F60 /* ItemsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A247D8023C32FF100E93F60 /* ItemsTableViewController.swift */; };
 		3A247D8323C3313B00E93F60 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A247D8223C3313B00E93F60 /* Item.swift */; };
 		3A25CEB923C60A82006443F4 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A25CEB823C60A82006443F4 /* CartViewController.swift */; };
+		3A2C86BF23C8919A008992E0 /* MUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A2C86BE23C8919A008992E0 /* MUser.swift */; };
 		3A3C8BFF23C4455B0038A41D /* ItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A3C8BFE23C4455B0038A41D /* ItemTableViewCell.swift */; };
 		3A3C8C0123C44E950038A41D /* HelperFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A3C8C0023C44E950038A41D /* HelperFunctions.swift */; };
 		3A3C8C0323C4543A0038A41D /* DetailItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A3C8C0223C4543A0038A41D /* DetailItemViewController.swift */; };
@@ -38,6 +39,7 @@
 		3A247D8023C32FF100E93F60 /* ItemsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemsTableViewController.swift; sourceTree = "<group>"; };
 		3A247D8223C3313B00E93F60 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		3A25CEB823C60A82006443F4 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
+		3A2C86BE23C8919A008992E0 /* MUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MUser.swift; sourceTree = "<group>"; };
 		3A3C8BFE23C4455B0038A41D /* ItemTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemTableViewCell.swift; sourceTree = "<group>"; };
 		3A3C8C0023C44E950038A41D /* HelperFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperFunctions.swift; sourceTree = "<group>"; };
 		3A3C8C0223C4543A0038A41D /* DetailItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailItemViewController.swift; sourceTree = SOURCE_ROOT; };
@@ -153,6 +155,7 @@
 				3AE2D8AD23C2F6B400D29E74 /* Category.swift */,
 				3A247D8223C3313B00E93F60 /* Item.swift */,
 				3AFDC35623C485E50048B1E4 /* Cart.swift */,
+				3A2C86BE23C8919A008992E0 /* MUser.swift */,
 			);
 			path = Class;
 			sourceTree = "<group>";
@@ -308,6 +311,7 @@
 				3ACBA6C023C2D765003847F9 /* CategoryCollectionViewController.swift in Sources */,
 				3AE2D8AE23C2F6B400D29E74 /* Category.swift in Sources */,
 				3A25CEB923C60A82006443F4 /* CartViewController.swift in Sources */,
+				3A2C86BF23C8919A008992E0 /* MUser.swift in Sources */,
 				3A3C8C0323C4543A0038A41D /* DetailItemViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
