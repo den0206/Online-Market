@@ -157,6 +157,28 @@ class MUser {
         }
     }
     
+    //MARK: Resend Link Method 今回使わず
+
+    class func resetPasswordFor(email : String, compltion : @escaping(_ error : Error?) -> Void) {
+        
+        Auth.auth().sendPasswordReset(withEmail: email) { (error) in
+            
+            compltion(error)
+        }
+    }
+    
+    class func resentVerificarionEmail(email :String, completion : @escaping(_ error : Error?) -> Void) {
+        
+        Auth.auth().currentUser?.reload(completion: { (error) in
+            
+            Auth.auth().currentUser?.sendEmailVerification(completion: { (error) in
+                
+                print("resend Email Error", error?.localizedDescription)
+                completion(error)
+            })
+        })
+    }
+    
    
     
 }
@@ -213,5 +235,6 @@ func saveUserLocal(_ userDictionary : NSDictionary) {
 func userDictionaryFrom(user : MUser)  -> NSDictionary {
     return NSDictionary(objects: [user.objectId, user.email,user.firstName, user.lastName, user.fullName,user.fullAdress ?? "" , user.onBoard, user.purchasedItemids], forKeys: [kOBJECTID as NSCopying, kEMAIL as NSCopying, kFIRSTNAME as NSCopying, kLASTNAME as NSCopying, kFULLNAME as NSCopying, kFULLADRESS as NSCopying, kONBOARD as NSCopying, kPURCHASEDITEMIDS as NSCopying])
 }
+
 
 

@@ -66,9 +66,26 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func forgotPasswordButtonPressed(_ sender: Any) {
+        
+        if emailTextField.text != "" {
+            
+            resetThePassword()
+            
+        } else {
+            HUD.textLabel.text = "Eメールの項目を埋めてください"
+            HUD.indicatorView = JGProgressHUDErrorIndicatorView()
+            HUD.show(in: self.view)
+            HUD.dismiss(afterDelay: 3.0)
+        }
+        
     }
     
     @IBAction func resendEmailButtonPressed(_ sender: Any) {
+        
+        MUser.resentVerificarionEmail(email: emailTextField.text!) { (error) in
+            
+            print(error?.localizedDescription)
+        }
     }
     
     @IBAction func cancelButtonPressed(_ sender: Any) {
@@ -91,6 +108,7 @@ class LoginViewController: UIViewController {
                 self.HUD.indicatorView = JGProgressHUDSuccessIndicatorView()
                 self.HUD.show(in: self.view)
                 self.HUD.dismiss(afterDelay: 3.0)
+                
                 
             } else {
                 print(error!.localizedDescription)
@@ -122,6 +140,7 @@ class LoginViewController: UIViewController {
                 self.HUD.indicatorView = JGProgressHUDErrorIndicatorView()
                 self.HUD.show(in: self.view)
                 self.HUD.dismiss(afterDelay: 3.0)
+                self.resendButtonOutlet.isHidden = false
             }
 
             self.hideLoadingIndicator()
@@ -188,6 +207,26 @@ class LoginViewController: UIViewController {
         
     }
     
+    private func resetThePassword() {
+        
+        MUser.resetPasswordFor(email: emailTextField.text!) { (error) in
+            
+            if error == nil {
+                // no error
+                
+                self.HUD.textLabel.text = "パスワード変更用のEメールを送りました"
+                self.HUD.indicatorView = JGProgressHUDSuccessIndicatorView()
+                self.HUD.show(in: self.view)
+                self.HUD.dismiss(afterDelay: 3.0)
+                
+            } else {
+                self.HUD.textLabel.text = error!.localizedDescription
+                self.HUD.indicatorView = JGProgressHUDErrorIndicatorView()
+                self.HUD.show(in: self.view)
+                self.HUD.dismiss(afterDelay: 3.0)
+            }
+        }
+    }
     
     
 }
