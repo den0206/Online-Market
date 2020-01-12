@@ -79,21 +79,25 @@ class DetailItemViewController: UIViewController {
     
     @objc func addCart() {
         
-//        downloadCartFromFirestore("1234") { (cart) in
-//
-//            if cart == nil {
-//                self.createNewCart()
-//            } else {
-//                cart!.itemIds.append(self.item.id)
-//                self.updateCart(cart: cart!, withValues: [kITEMSIDS : cart!.itemIds])
-//            }
-//        }
-//
-////        createNewCart()
-//
-//        // else update
         
-        showLoginView()
+
+        
+        if MUser.currentUser() != nil {
+            
+            downloadCartFromFirestore(MUser.currentID()) { (cart) in
+
+                if cart == nil {
+                    self.createNewCart()
+                } else {
+                    cart!.itemIds.append(self.item.id)
+                    self.updateCart(cart: cart!, withValues: [kITEMSIDS : cart!.itemIds])
+                }
+            }
+        } else {
+            showLoginView()
+        }
+        
+        
         
     }
     
@@ -117,7 +121,7 @@ class DetailItemViewController: UIViewController {
         let newCart = Cart()
         
         newCart.id = UUID().uuidString
-        newCart.ownerId = "1234"
+        newCart.ownerId = MUser.currentID()
         newCart.itemIds = [self.item.id]
         saveCartToFirestore(newCart)
         

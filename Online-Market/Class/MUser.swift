@@ -157,6 +157,8 @@ class MUser {
         }
     }
     
+    
+    
     //MARK: Resend Link Method 今回使わず
 
     class func resetPasswordFor(email : String, compltion : @escaping(_ error : Error?) -> Void) {
@@ -179,9 +181,25 @@ class MUser {
         })
     }
     
+    
+    class func logOutCurrentUser(completion : @escaping(_ error : Error?) -> Void) {
+        
+        do {
+            try Auth.auth().signOut()
+            
+            UserDefaults.standard.removeObject(forKey: kCURRENTUSER)
+            UserDefaults.standard.synchronize()
+            completion(nil)
+        } catch let error as NSError {
+            completion(error)
+            
+        }
+        
+        
+    }
    
     
-}
+} // End of MUser Class
 
 //MARK: Helper
 
@@ -236,5 +254,31 @@ func userDictionaryFrom(user : MUser)  -> NSDictionary {
     return NSDictionary(objects: [user.objectId, user.email,user.firstName, user.lastName, user.fullName,user.fullAdress ?? "" , user.onBoard, user.purchasedItemids], forKeys: [kOBJECTID as NSCopying, kEMAIL as NSCopying, kFIRSTNAME as NSCopying, kLASTNAME as NSCopying, kFULLNAME as NSCopying, kFULLADRESS as NSCopying, kONBOARD as NSCopying, kPURCHASEDITEMIDS as NSCopying])
 }
 
+//MARK: Update User Profile
+
+func updateCurrentUserInFireStore(withValues : [String : Any], completion : @escaping(_ error : Error?) -> Void) {
+    
+    if let dictionary = UserDefaults.standard.object(forKey: kCURRENTUSER) {
+        
+        let userObject = ( dictionary as! NSDictionary).mutableCopy() as! NSMutableDictionary
+        userObject.setValuesForKeys(withValues)
+        
+        let currentId = MUser.currentID()
+        
+        FirebaseReference(.User).document(currentId).updateData(withValues) { (error) in
+            
+            completion(error)
+            
+            // update Success
+            if error == nil {
+                
+                saveUserLocal(userObject)
+                
+                
+            }
+        }
+    }
+    
+}
 
 

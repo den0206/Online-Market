@@ -39,6 +39,9 @@ class ProfileTableViewController: UITableViewController {
         return 3
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
     
     //MARK: no use because static Cells
    
@@ -48,6 +51,7 @@ class ProfileTableViewController: UITableViewController {
 //    }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
         
     }
     
@@ -69,11 +73,14 @@ class ProfileTableViewController: UITableViewController {
                 finishRegistrationButtonOutlet.tintColor = .red
             }
             
+            histroryButtonOutlet.isEnabled = true
+            
+            
         } else {
             
             finishRegistrationButtonOutlet.setTitle("Logged Out", for: .normal)
-            finishRegistrationButtonOutlet.isHidden = false
-            histroryButtonOutlet.isHidden = false
+            finishRegistrationButtonOutlet.isEnabled = false
+            histroryButtonOutlet.isEnabled = false
         }
     }
     
@@ -81,7 +88,8 @@ class ProfileTableViewController: UITableViewController {
         
         if MUser.currentUser() == nil {
             
-            createRightBarButton(title: "login")
+            createRightBarButton(title: "Login")
+            
         } else {
             
             // login Now
@@ -104,9 +112,10 @@ class ProfileTableViewController: UITableViewController {
     
     @objc func rightBarButtonPressed() {
         
-        if editButtonItem.title == "Login" {
+        if editBarButtonOutlet.title == "Login" {
             // show LoginView
             showLoginVC()
+            
         } else {
             // go to Edit Profile
             
@@ -124,7 +133,9 @@ class ProfileTableViewController: UITableViewController {
     }
     
     private func showEditProfileVC() {
-        print("editProfile")
+        
+        performSegue(withIdentifier: "editProfileSeg" , sender: self)
+        
     }
     
     

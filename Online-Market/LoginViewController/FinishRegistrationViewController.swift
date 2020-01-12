@@ -25,6 +25,8 @@ class FinishRegistrationViewController: UIViewController {
         super.viewDidLoad()
         
         doneButtonOutlet.isEnabled = false
+        
+        // check did change textField
          
         nameTextField.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
         surNameTextField.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
@@ -42,7 +44,9 @@ class FinishRegistrationViewController: UIViewController {
     @IBAction func doneButtonPressed(_ sender: Any) {
         
         if checkTectField() {
-            print("aa")
+            
+            finishOnBoarding()
+            
         } else {
             HUD.textLabel.text = "全ての項目を埋めてください"
             HUD.indicatorView = JGProgressHUDErrorIndicatorView()
@@ -73,5 +77,36 @@ class FinishRegistrationViewController: UIViewController {
         }
     }
     
+    //MARK: Update User Profile(Onboard)
+    
+    private func finishOnBoarding() {
+        
+        let withValues = [kFIRSTNAME : nameTextField.text!,
+                          kLASTNAME : surNameTextField.text!,
+                          kONBOARD : true,
+                          kFULLADRESS : addressTextField.text!,
+                          kFULLNAME : (nameTextField.text! + " " + surNameTextField.text!)] as [String : Any]
+        
+        updateCurrentUserInFireStore(withValues: withValues) { (error) in
+            
+            if error == nil {
+                // no error
+                
+                self.HUD.textLabel.text = "更新しました"
+                self.HUD.indicatorView = JGProgressHUDSuccessIndicatorView()
+                self.HUD.show(in: self.view)
+                self.HUD.dismiss(afterDelay: 3.0)
+                
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                print("エラー", error?.localizedDescription)
+                
+                self.HUD.textLabel.text = "更新に失敗しました"
+                self.HUD.indicatorView = JGProgressHUDErrorIndicatorView()
+                self.HUD.show(in: self.view)
+                self.HUD.dismiss(afterDelay: 3.0)
+            }
+        }
+    }
 
 }

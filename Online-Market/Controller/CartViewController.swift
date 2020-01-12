@@ -25,26 +25,65 @@ class CartViewController: UIViewController {
     
     let HUD = JGProgressHUD(style: .dark)
     
+    // PayPal Vars
+    
+    var enviroment : String = PayPalEnvironmentNoNetwork {
+        willSet(newEnviroment) {
+            if (newEnviroment != enviroment) {
+                PayPalMobile.preconnect(withEnvironment: newEnviroment)
+            }
+        }
+    }
+    
+    var payPalConfig = PayPalConfiguration()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.tableFooterView = footerView
+        
+        setupPaypal()
 
         
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        if MUser.currentUser() != nil {
+            loadCartFromFirestore()
+        } else {
+            self.updateTotalLabels(true)
+        }
 
-        loadCartFromFirestore()
 
     }
 
 //    MARK: IBActions
     
- 
+    
     @IBAction func checkoutBUttonPressed(_ sender: Any) {
+        
+        if MUser.currentUser()!.onBoard {
+            
+            // append Ids
+//            tempFunction()
+            
+            // update purchased
+//            addItemToPurchasedHistory(self.purchasedItemIds)
+//
+//            resetTheCart()
+            
+            payButtonPressed()
+            
+        } else {
+            
+            self.HUD.textLabel.text = "アクティブして下さい。"
+            self.HUD.indicatorView = JGProgressHUDErrorIndicatorView()
+            self.HUD.show(in: self.view)
+            self.HUD.dismiss(afterDelay: 3.0)
+        }
         
     }
     
@@ -52,7 +91,7 @@ class CartViewController: UIViewController {
     
     private func loadCartFromFirestore() {
         
-        downloadCartFromFirestore("1234") { (cart) in
+        downloadCartFromFirestore(MUser.currentID()) { (cart) in
             self.cart = cart
             self.getCartItems()
         }
@@ -71,6 +110,16 @@ class CartViewController: UIViewController {
 
     }
     
+    //MARK: Helpers
+    
+//    func tempFunction() {
+//
+//        for item in allItems {
+//
+//            purchasedItemIds.append(item.id)
+//        }
+//    }
+//
     
     private func updateTotalLabels(_ isEmpty : Bool) {
         
@@ -122,6 +171,97 @@ class CartViewController: UIViewController {
             }
         }
     }
+    
+    private func resetTheCart() {
+        
+        purchasedItemIds.removeAll()
+        allItems.removeAll()
+        
+        tableView.reloadData()
+        
+        cart!.itemIds = []
+        
+        updateCartInFirestore(cart!, withValues: [kITEMSIDS : cart!.itemIds]) { (error) in
+            
+            if error != nil {
+                print("エラー: \(error?.localizedDescription)")
+            } else {
+                self.getCartItems()
+            }
+        }
+        
+    }
+    
+    private func addItemToPurchasedHistory(_ itemIds : [String]) {
+        
+        if MUser.currentUser() != nil {
+            
+            let newItemIds = MUser.currentUser()!.purchasedItemids + itemIds
+            updateCurrentUserInFireStore(withValues: [kPURCHASEDITEMIDS : newItemIds]) { (error) in
+                
+                if error != nil {
+                    print("エラー: \(error?.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    //MARK: PayPal
+    
+    private func setupPaypal() {
+        
+        payPalConfig.acceptCreditCards = false
+        payPalConfig.merchantName = "iOS Yuuki"
+        
+        payPalConfig.merchantPrivacyPolicyURL = URL(string: "https://www.paypal.com/webapps/mpp/ua/privacy-full")
+        payPalConfig.merchantUserAgreementURL = URL(string: "https://www.paypal.com/webapps/mpp/ua/useragreement-full")
+        
+        
+        payPalConfig.languageOrLocale = Locale.preferredLanguages[0]
+        payPalConfig.payPalShippingAddressOption = .both
+    }
+    
+    private func payButtonPressed() {
+        
+        var itemsToBuy : [PayPalItem] = []
+        
+        for item in allItems {
+            let tempItem = PayPalItem(name: item.name, withQuantity: 1, withPrice: NSDecimalNumber(value: item.price), withCurrency: "USD", withSku: nil)
+            
+            purchasedItemIds.append(item.id)
+            itemsToBuy.append(tempItem)
+        }
+        
+        let subTotal = PayPalItem.totalPrice(forItems: itemsToBuy)
+        
+        // options
+        let shippingCost = NSDecimalNumber(string: "50.0")
+        let tax = NSDecimalNumber(string: "5.00")
+        
+        //payment
+        let paymentDetails = PayPalPaymentDetails(subtotal: subTotal, withShipping: shippingCost, withTax: tax)
+        
+        let total = subTotal.adding(shippingCost).adding(tax)
+        
+        let payment = PayPalPayment(amount: total, currencyCode: "USD", shortDescription: "Payment To Yuuki", intent: .sale)
+        
+        payment.items = itemsToBuy
+        payment.paymentDetails = paymentDetails
+        
+        // prresent Paypal Popup
+        
+        if payment.processable {
+            
+            let paymentViewController = PayPalPaymentViewController(payment: payment, configuration: payPalConfig, delegate: self)
+            
+            present(paymentViewController!, animated: true, completion: nil)
+            
+        } else {
+            print("payment not Processible")
+        }
+        
+    }
+
 
 }
 
@@ -188,6 +328,30 @@ extension CartViewController : UITableViewDelegate, UITableViewDataSource {
             }
             
         }
+    }
+    
+    
+}
+
+//MARK: Paypal Delegate
+
+extension CartViewController : PayPalPaymentDelegate {
+    
+    func payPalPaymentDidCancel(_ paymentViewController: PayPalPaymentViewController) {
+        print("Cancel")
+        paymentViewController.dismiss(animated: true, completion: nil)
+    }
+    
+    func payPalPaymentViewController(_ paymentViewController: PayPalPaymentViewController, didComplete completedPayment: PayPalPayment) {
+        
+        paymentViewController.dismiss(animated: true) {
+            
+            // ex : send thankusFUll Email TO customer
+            
+            self.addItemToPurchasedHistory(self.purchasedItemIds)
+            self.resetTheCart()
+        }
+        
     }
     
     
